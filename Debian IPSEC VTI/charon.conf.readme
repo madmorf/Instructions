@@ -1,4 +1,7 @@
 #CHANGE IN CONFIG
+. Заборонити вносити статичні маршрути в таблицю маршрутизації. 
+/etc/strongswan.d/charon.conf 
+
 
 # Options for the charon IKE daemon. 
 charon { 
