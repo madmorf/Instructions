@@ -1,0 +1,7 @@
+#CHANGE IN CONFIG
+
+# Options for the charon IKE daemon. 
+charon { 
+     install_routes = no 
+     install_virtual_ip = no
+     
