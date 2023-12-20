@@ -11,11 +11,11 @@ case "$PLUTO_CONNECTION" in
     VTI_LOCALADDR=10.111.11.2
     VTI_REMOTEADDR=10.111.11.1
     ;;
-  vti1)
-    VTI_INTERFACE=vti1
-    VTI_LOCALADDR=10.111.12.2
-    VTI_REMOTEADDR=10.111.12.1
-    ;;
+#  vti1)
+#    VTI_INTERFACE=vti1
+#    VTI_LOCALADDR=10.111.12.2
+#    VTI_REMOTEADDR=10.111.12.1
+#    ;;
 esac
 
 case "${PLUTO_VERB}" in
@@ -25,6 +25,19 @@ case "${PLUTO_VERB}" in
         sysctl -w net.ipv4.conf.${VTI_INTERFACE}.rp_filter=2 || sysctl -w net.ipv4.conf.${VTI_INTERFACE}.rp_filter=0
         $IP addr add ${VTI_LOCALADDR} remote ${VTI_REMOTEADDR} dev ${VTI_INTERFACE}
         $IP link set ${VTI_INTERFACE} up mtu 1436
+        ip route add 192.168.80.0/24 dev vti0
+        ip route add 192.168.70.0/24 dev vti0
+        ip route add 192.168.71.0/24 dev vti0
+        ip route add 192.168.72.0/24 dev vti0
+        ip route add 192.168.73.0/24 dev vti0
+        ip route add 192.168.74.0/24 dev vti0
+        ip route add 192.168.75.0/24 dev vti0
+        ip route add 192.168.76.0/24 dev vti0
+        ip route add 192.168.77.0/24 dev vti0
+        ip route add 192.168.78.0/24 dev vti0
+        ip route add 192.168.79.0/24 dev vti0
+        ip route add 192.168.81.0/24 dev vti0
+        ip route add 192.168.82.0/24 dev vti0
 #       $IPTABLES -t mangle -I FORWARD -o ${VTI_INTERFACE} -p tcp -m tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu
 #        $IPTABLES -t mangle -I INPUT -p esp -s ${PLUTO_PEER} -d ${PLUTO_ME} -j MARK --set-xmark ${PLUTO_MARK_IN}
 #        $IP route flush table 220
