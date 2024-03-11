@@ -1,0 +1,30 @@
+apt install sudo curl gpg 
+
+# insall linux odbc driver
+curl https://packages.microsoft.com/config/debian/12/prod.list | sudo tee /etc/apt/sources.list.d/mssql-release.list
+curl -fsSL https://packages.microsoft.com/keys/microsoft.asc | sudo gpg --dearmor -o /usr/share/keyrings/microsoft-prod.gpg
+sudo apt-get update
+sudo ACCEPT_EULA=Y apt-get install -y msodbcsql18
+
+
+# edit /etc/odbc.ini
+[geeknet-db]
+Server = tcp:192.168.200.10
+Driver = ODBC Driver 18 for SQL Server
+TrustServerCertificate=yes
+
+# add user to mssql 
+# View Server State and View Any Definition permissions should be granted to the user
+zbx_monitor
+
+# add user to msdb
+# run query from msdb
+GRANT SELECT ON OBJECT::msdb.dbo.sysjobs TO zbx_monitor;
+GRANT SELECT ON OBJECT::msdb.dbo.sysjobservers TO zbx_monitor;
+GRANT SELECT ON OBJECT::msdb.dbo.sysjobactivity TO zbx_monitor;
+GRANT EXECUTE ON OBJECT::msdb.dbo.agent_datetime TO zbx_monitor;
+
+# configure DSN name - Control Panel\Administration\ODBC
+
+# check connectivity 
+isql -vvv geeknet-db zbx_monitor ujvjcbre
