@@ -1,0 +1,6 @@
+# run in CT
+systemctl mask systemd-logind
+
+pam-auth-update
+
+[ ] Register user sessions in the systemd control group hierarchy

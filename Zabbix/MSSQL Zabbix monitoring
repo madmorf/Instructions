@@ -14,7 +14,7 @@ Driver = ODBC Driver 18 for SQL Server
 TrustServerCertificate=yes
 
 # add user to mssql 
-# View Server State and View Any Definition permissions should be granted to the user
+# View Server State and View Any Definition permissions should be granted to the user in securables
 zbx_monitor
 
 # add user to msdb
