@@ -1,0 +1,22 @@
+#change in /etc/fail2ban/jail.conf
+
+[sshd]
+backend = systemd
+
+
+[proxmox]
+enabled = true
+port = https,http,8006
+filter = proxmox
+backend = systemd
+maxretry = 3
+findtime = 2d
+bantime = 1h
+
+
+#create file 
+/etc/fail2ban/filter.d/proxmox.conf
+
+[Definition]
+failregex = pvedaemon\[.*authentication failure; rhost=<HOST> user=.* msg=.*
+ignoreregex =
