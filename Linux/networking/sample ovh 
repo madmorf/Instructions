@@ -1,0 +1,55 @@
+#!/bin/bash
+#Renew iptables
+iptables -F
+iptables -X
+iptables -t nat -F
+iptables -t nat -X
+iptables -t mangle -F
+iptables -t mangle -X
+
+#ssh
+iptables -A INPUT -i ens3 -p tcp --dport 22 -j ACCEPT
+
+#gre
+iptables -A INPUT -p gre -j ACCEPT
+
+#ipsec
+iptables -A INPUT -p udp --dport 500 -j ACCEPT
+iptables -A INPUT -p esp -j ACCEPT
+
+#zabbix
+iptables -A INPUT -i ens3 -p tcp --dport 10050 -j ACCEPT
+
+#Loopback
+iptables -A INPUT -i lo -j ACCEPT
+iptables -A OUTPUT -o lo -j ACCEPT
+
+#Packet rules
+iptables -A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
+iptables -P INPUT DROP
+iptables -A INPUT -m state --state INVALID -j DROP
+iptables -A INPUT -p tcp --tcp-flags ALL NONE -j DROP
+iptables -P FORWARD ACCEPT
+iptables -A FORWARD -m state --state INVALID -j DROP
+iptables -P OUTPUT ACCEPT
+
+#ICMP
+iptables -A INPUT -p icmp --icmp-type echo-reply -j ACCEPT
+iptables -A INPUT -p icmp --icmp-type destination-unreachable -j ACCEPT
+iptables -A INPUT -p icmp --icmp-type time-exceeded -j ACCEPT
+iptables -A INPUT -p icmp --icmp-type echo-request -j ACCEPT
+
+#ovpn
+iptables -I INPUT -i tun0 -j ACCEPT
+iptables -I FORWARD -i ens3 -o tun0 -j ACCEPT
+iptables -I FORWARD -i tun0 -o eth0 -j ACCEPT
+#iptables -I INPUT -i ens3 -p udp --dport 1194 -j ACCEPT
+iptables -I INPUT -i ens3 -p udp --dport 1195 -j ACCEPT
+
+#NAT rules
+#iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+#redirect
+iptables --table nat --append POSTROUTING --source 192.168.81.0/24 --jump SNAT --to 57.128.178.80
+iptables -t mangle -A POSTROUTING -p tcp --tcp-flags SYN,RST SYN -o ens3 -j TCPMSS --clamp-mss-to-pmtu
+
+
