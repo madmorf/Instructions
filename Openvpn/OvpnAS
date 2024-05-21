@@ -1,0 +1,73 @@
+#AS OVPN
+
+apt update && apt -y install ca-certificates wget net-tools gnupg
+wget https://as-repository.openvpn.net/as-repo-public.asc -qO /etc/apt/trusted.gpg.d/as-repository.asc
+#deb 12
+echo "deb [arch=amd64 signed-by=/etc/apt/trusted.gpg.d/as-repository.asc] http://as-repository.openvpn.net/as/debian bookworm main">/etc/apt/sources.list.d/openvpn-as-repo.list
+#deb 11
+echo "deb [arch=amd64 signed-by=/etc/apt/trusted.gpg.d/as-repository.asc] http://as-repository.openvpn.net/as/debian bullseye main">/etc/apt/sources.list.d/openvpn-as-repo.list
+#deb 10
+echo "deb [arch=amd64 signed-by=/etc/apt/trusted.gpg.d/as-repository.asc] http://as-repository.openvpn.net/as/debian buster main">/etc/apt/sources.list.d/openvpn-as-repo.list
+
+apt update && apt -y install openvpn-as
+
+
+проверить ls /usr/local/openvpn_as/lib/python/pyovpn-2.0-py3.9.egg
+
+apt install git
+
+git clone https://github.com/rocky/python-decompile3
+cd python-decompile3
+apt-get -y install python3-pip
+pip3 install -e.
+mkdir /opt/ovpn && cd /opt/ovpn
+cp /usr/local/openvpn_as/lib/python/pyovpn-2.0-py3.9.egg ./
+cp /usr/local/openvpn_as/lib/python/pyovpn-2.0-py3.9.egg pyovpn-2.0-py3.9.zip
+apt install unzip
+unzip pyovpn-2.0-py3.9.zip && rm pyovpn-2.0-py3.9.zip
+cd ./pyovpn/lic
+# если не работает, установить pip3 install uncompyle6
+decompyle3 uprop.pyc > uprop.py
+##
+nano uprop.py
+
+
+
+...
+            apc = self._apc()
+            v_agg += apc
+            if ret == None:
+                ret = {}
+            ret[prop] = max(v_agg + v_nonagg, bool('v_agg') + bool('v_nonagg'))
+            ret['apc'] = bool(apc)
+            if DEBUG:
+                print("ret['%s'] = v_agg(%d) + v_nonagg(%d)" % (prop, v_agg, v_nonagg))
+        ret['concurrent_connections'] = 2000 # добавить строку добавляем ret['concurrent_connections'] = 2000
+        return ret
+    def _apc(self):
+...
+
+
+
+добавляем ret['concurrent_connections'] = 2000
+
+
+python3 -m compileall uprop.py
+rm uprop.pyc uprop.py
+cp __pycache__/uprop.cpython-37.pyc ./uprop.pyc
+rm -Rf __pycache__
+
+cd /opt/ovpn
+apt install zip
+zip -r *
+rm /usr/local/openvpn_as/lib/python/pyovpn-2.0-py3.7.egg
+cp common.zip /usr/local/openvpn_as/lib/python/pyovpn-2.0-py3.7.egg
+
+service openvpnas stop
+rm /var/log/openvpnas.log
+touch /var/log/openvpnas.log
+service openvpnas start
+
+
+
+./confdba --mod --key=iptables.vpn.disable.filter --value=True --prof=Default
